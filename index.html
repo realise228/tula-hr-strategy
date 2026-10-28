@@ -3,963 +3,1080 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кадровая стратегия Тульской области | Полный доклад</title>
+    <title>Кадровая стратегия и СЭР Тульской области | Полный доклад</title>
     <style>
         :root {
             --bg-main: #0a0f18;
             --bg-panel: #121a27;
             --bg-panel-light: #1c2738;
             --text-main: #e2e8f0;
-            --text-muted: #8b9bb4;
+            --text-muted: #94a3b8;
             --accent-gold: #c5a059;
             --accent-steel: #4a6b8c;
             --border-color: #2a3a52;
-            --danger: #b33939;
-            --success: #218c74;
-            --chart-1: #c5a059;
-            --chart-2: #4a6b8c;
-            --chart-3: #8b9bb4;
-            --chart-4: #b33939;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        h1, h2, h3, .serif {
+        h1, h2, h3, h4, .serif {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-weight: normal;
             letter-spacing: 0.5px;
         }
 
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 40px; }
-
-        /* Верхняя плашка */
-        .top-bar {
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            background: var(--bg-main);
-            animation: slideDown 1s ease-out;
+        /* Прогресс-бар */
+        .progress-bar-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: var(--border-color); z-index: 1000;
         }
-        .top-bar span { color: var(--accent-gold); font-weight: bold; }
-
-        .pulse-dot {
-            display: inline-block; width: 8px; height: 8px;
-            background-color: var(--danger); border-radius: 50%;
-            margin-right: 10px;
-            box-shadow: 0 0 0 0 rgba(179, 57, 57, 0.7);
-            animation: pulse 2s infinite;
+        .progress-bar {
+            height: 100%; background: var(--accent-gold);
+            width: 0%; transition: width 0.4s ease;
         }
 
-        /* Титульник */
-        header {
-            padding: 100px 0 80px;
-            border-bottom: 1px solid var(--border-color);
-            position: relative;
-        }
-        .doc-type {
-            color: var(--accent-gold);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-            display: inline-block;
-            border-left: 3px solid var(--accent-gold);
-            padding-left: 15px;
-            opacity: 0;
-            animation: fadeInLeft 1s ease-out 0.3s forwards;
-        }
-        h1 {
-            font-size: 4.2rem;
-            line-height: 1.1;
-            margin-bottom: 30px;
-            color: #ffffff;
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.6s forwards;
-        }
-        .subtitle {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 850px;
-            font-weight: 300;
-            border-left: 1px solid var(--border-color);
-            padding-left: 20px;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.9s forwards;
+        /* Контейнер */
+        .slides-container {
+            width: 100vw; height: 100vh; position: relative;
         }
 
-        /* Секции */
-        section {
-            padding: 70px 0;
-            border-bottom: 1px solid var(--border-color);
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        /* Слайд */
+        .slide {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            display: flex; align-items: center; justify-content: center;
+            padding: 30px 50px;
+            overflow-y: auto;
         }
-        section.visible { opacity: 1; transform: translateY(0); }
+        .slide.active { opacity: 1; visibility: visible; z-index: 10; }
 
-        h2 {
-            font-size: 2.3rem;
-            margin-bottom: 45px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-        }
-        h2::after {
-            content: ''; flex-grow: 1; height: 1px;
-            background: var(--border-color); margin-left: 30px;
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 1.2s ease-out 0.3s;
-        }
-        section.visible h2::after { transform: scaleX(1); }
-
-        h3.block-title {
-            font-size: 1.4rem; color: var(--accent-gold);
-            margin-bottom: 25px; padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        p { margin-bottom: 20px; color: var(--text-muted); font-size: 1.05rem; }
-        ul { color: var(--text-muted); padding-left: 20px; line-height: 1.8; margin-bottom: 20px; }
-        li { margin-bottom: 8px; }
-
-        /* Сетка карточек */
-        .grid-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background: var(--border-color);
-            border: 1px solid var(--border-color);
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--bg-panel);
-            padding: 35px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 100%; height: 2px; background: var(--accent-gold);
-            transform: scaleX(0); transform-origin: left;
+        .slide-content {
+            max-width: 1500px; width: 100%;
+            transform: translateY(15px);
             transition: transform 0.5s ease;
         }
-        .stat-card:hover { background: var(--bg-panel-light); }
-        .stat-card:hover::before { transform: scaleX(1); }
+        .slide.active .slide-content { transform: translateY(0); }
 
-        .stat-value {
-            font-size: 3.2rem;
-            font-family: 'Georgia', serif;
-            color: #ffffff;
-            line-height: 1; margin-bottom: 15px;
-            transition: color 0.3s;
+        /* Титул и разделители */
+        .title-slide {
+            text-align: center; border: 2px solid var(--accent-gold);
+            padding: 80px 60px; background: rgba(18, 26, 39, 0.5);
         }
-        .stat-card:hover .stat-value { color: var(--accent-gold); }
-        .stat-unit { font-size: 1.1rem; color: var(--accent-steel); font-family: 'Inter', sans-serif; }
-        .stat-label {
-            font-size: 0.85rem; text-transform: uppercase;
-            letter-spacing: 1px; color: var(--text-muted);
-            margin-bottom: 15px; font-weight: 600;
+        .title-slide h1 {
+            font-size: 3rem; color: #fff; margin-bottom: 20px; text-transform: uppercase;
         }
-        .stat-trend {
-            display: inline-block; font-size: 0.85rem;
-            padding: 4px 0; font-weight: bold;
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .trend-down { color: var(--danger); }
-        .trend-up { color: var(--success); }
+        .title-slide p { font-size: 1.4rem; color: var(--accent-gold); font-style: italic; }
 
-        /* Блок проблем */
-        .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
-        .problem-card {
-            background: var(--bg-panel); padding: 40px;
-            border-top: 3px solid var(--accent-steel);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .section-divider {
+            text-align: center; padding: 100px;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--accent-gold);
+            border-bottom: 1px solid var(--accent-gold);
         }
-        .problem-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
-        .problem-card.danger { border-top-color: var(--danger); }
-        .problem-card.info { border-top-color: var(--accent-gold); }
-        .problem-title {
-            font-size: 1.4rem; margin-bottom: 20px; color: #fff;
-            font-family: 'Georgia', serif; display: flex; align-items: center;
-        }
-        .problem-desc { color: var(--text-muted); font-size: 1.05rem; }
-        .problem-desc strong { color: #fff; border-bottom: 1px solid var(--accent-gold); }
+        .section-divider h2 { border: none; padding: 0; margin-bottom: 10px; font-size: 3rem; }
+        .section-divider p { font-size: 1.2rem; color: var(--text-muted); }
 
-        /* Таблица */
-        .table-container { border: 1px solid var(--border-color); background: var(--bg-panel); overflow-x: auto; margin-bottom: 30px; }
+        /* Заголовки */
+        h2 {
+            font-size: 1.8rem; color: var(--accent-gold);
+            margin-bottom: 20px; border-left: 5px solid var(--accent-gold);
+            padding-left: 15px; text-transform: uppercase;
+        }
+        h3 {
+            font-size: 1.15rem; color: #fff;
+            margin: 15px 0 10px; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        p, li {
+            font-size: 0.95rem; color: var(--text-muted);
+            line-height: 1.4; margin-bottom: 8px;
+        }
+        ul { padding-left: 18px; }
+        li strong { color: #fff; }
+
+        /* Сетки */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+        /* Карточки */
+        .stat-card {
+            background: var(--bg-panel); padding: 15px;
+            border-top: 2px solid var(--accent-steel); height: 100%;
+        }
+        .stat-card.gold-border { border-top-color: var(--accent-gold); }
+        .stat-value { font-size: 1.8rem; font-family: 'Georgia', serif; color: #fff; margin-bottom: 5px; line-height: 1.1; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); line-height: 1.2; }
+
+        /* Таблицы */
+        .table-container {
+            border: 1px solid var(--border-color); background: var(--bg-panel);
+            margin-top: 10px; max-height: 400px; overflow-y: auto;
+        }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th {
-            background: var(--bg-panel-light); padding: 20px 25px;
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px;
-            color: var(--accent-gold); border-bottom: 2px solid var(--border-color);
-            font-family: 'Inter', sans-serif;
+            background: var(--bg-panel-light); padding: 8px 10px;
+            font-size: 0.75rem; text-transform: uppercase;
+            color: var(--accent-gold); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0;
         }
         td {
-            padding: 20px 25px; border-bottom: 1px solid var(--border-color);
-            color: var(--text-muted); font-size: 0.95rem;
-            transition: background 0.3s, color 0.3s;
+            padding: 6px 10px; border-bottom: 1px solid var(--border-color);
+            color: var(--text-main); font-size: 0.85rem;
         }
-        td strong { color: #fff; }
-        tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: rgba(197, 160, 89, 0.05); color: #fff; }
+        td:first-child { font-weight: bold; color: #fff; }
 
-        .badge {
-            display: inline-block; padding: 5px 12px; font-size: 0.75rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            border: 1px solid var(--border-color); transition: all 0.3s ease;
-        }
-        .badge.general { color: var(--text-muted); }
-        .badge.unique { color: var(--accent-gold); border-color: var(--accent-gold); }
-        .badge.unique:hover { background: var(--accent-gold); color: var(--bg-main); }
-
-        /* Графики */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-        .chart-box {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            position: relative;
-        }
-        .chart-title {
-            font-family: 'Georgia', serif;
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Блок акцента */
+        .highlight-box {
+            background: var(--bg-panel); border-left: 3px solid var(--accent-gold);
+            padding: 12px 15px; margin: 12px 0; font-size: 0.9rem;
         }
 
-        .svg-container { width: 100%; height: auto; }
-        .donut-segment {
-            stroke: var(--bg-panel); stroke-width: 2px;
-            transition: opacity 0.3s, stroke-dasharray 1.5s ease-out;
-            cursor: pointer;
+        /* Навигация */
+        .nav-controls {
+            position: fixed; bottom: 20px; right: 30px;
+            display: flex; gap: 10px; z-index: 1000;
         }
-        .donut-segment:hover { opacity: 0.8; }
-        .bar-chart rect { transition: height 1s ease-out, y 1s ease-out; }
-        .h-bar { transition: width 1.2s ease-out; }
-        .svg-axis { stroke: var(--border-color); stroke-width: 1; }
-        .svg-label { fill: var(--text-muted); font-size: 12px; font-family: 'Inter', sans-serif; }
-        .svg-value { fill: #fff; font-size: 14px; font-weight: bold; font-family: 'Inter', sans-serif; }
-        .legend-item { display: flex; align-items: center; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); }
-        .legend-color { width: 12px; height: 12px; margin-right: 10px; border-radius: 2px; }
+        .nav-btn {
+            background: var(--bg-panel); border: 1px solid var(--accent-gold);
+            color: var(--accent-gold); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.2rem; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: var(--accent-gold); color: var(--bg-main); }
+        .slide-counter {
+            position: fixed; bottom: 25px; left: 30px;
+            color: var(--text-muted); font-size: 0.9rem; font-family: 'Georgia', serif; z-index: 1000;
+        }
 
-        /* OKR */
-        .okr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 30px; margin-bottom: 30px; }
-        .okr-card {
-            background: var(--bg-panel);
-            border-left: 3px solid var(--accent-gold);
-            padding: 25px;
-        }
-        .okr-title { color: var(--accent-gold); font-size: 1rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
-        .okr-desc { color: #fff; font-size: 1.1rem; margin-bottom: 15px; font-family: 'Georgia', serif; }
-        .okr-values { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-muted); }
-        .okr-values span { font-weight: bold; color: var(--accent-steel); }
-        .okr-values .target { color: var(--success); }
-
-        /* Инициативы */
-        .initiatives-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 30px; }
-        .initiative-card {
-            border: 1px solid var(--border-color); padding: 35px 30px;
-            position: relative; background: var(--bg-panel);
-            transition: all 0.4s ease; cursor: default;
-        }
-        .initiative-card:hover { background: var(--bg-panel-light); border-color: var(--accent-steel); transform: translateY(-5px); }
-        .initiative-num {
-            font-family: 'Georgia', serif; font-size: 3.5rem;
-            color: var(--bg-panel-light); position: absolute;
-            top: 15px; right: 25px; line-height: 1; transition: color 0.4s ease;
-        }
-        .initiative-card:hover .initiative-num { color: rgba(197, 160, 89, 0.2); }
-        .initiative-title {
-            font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;
-            color: #fff; position: relative; z-index: 1;
-            padding-right: 50px; font-family: 'Georgia', serif;
-        }
-        .initiative-text { font-size: 0.95rem; color: var(--text-muted); position: relative; z-index: 1; }
-
-        /* Подвал */
-        footer {
-            padding: 60px 0; color: var(--text-muted); font-size: 0.85rem;
-            display: flex; justify-content: space-between;
-            border-top: 1px solid var(--border-color); margin-top: 50px;
-        }
-        footer p { max-width: 600px; }
-
-        /* Анимации */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(179, 57, 57, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(179, 57, 57, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(179, 57, 57, 0); }
-        }
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-
-        @media (max-width: 1024px) {
-            .grid-stats { grid-template-columns: repeat(2, 1fr); }
-            .initiatives-grid, .charts-grid, .okr-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .grid-stats, .problem-grid, .initiatives-grid, .charts-grid, .okr-grid { grid-template-columns: 1fr; }
-            .container { padding: 0 20px; }
-            .top-bar { flex-direction: column; gap: 10px; }
-        }
+        /* Скроллбар */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <div class="top-bar">
-            <div><span class="pulse-dot"></span>Конфиденциально · Для служебного пользования</div>
-            <div>Центральный Федеральный Округ · <span>Тульская область</span></div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="slides-container">
+
+        <!-- ================= ЧАСТЬ 1: КАДРОВАЯ СТРАТЕГИЯ ================= -->
+
+        <!-- Слайд 1: Титул -->
+        <div class="slide active">
+            <div class="slide-content title-slide">
+                <h1>Кадровая стратегия и социально-экономическое развитие</h1>
+                <p>Тульской области: аналитика, вызовы и перспективы до 2036 года</p>
+            </div>
         </div>
 
-        <header>
-            <div class="doc-type">Аналитический доклад · Полная версия</div>
-            <h1>Кадровая стратегия<br>Тульской области</h1>
-            <p class="subtitle">Синхронизация системы подготовки кадров с промышленным заказом. Обеспечение экономического суверенитета и технологического лидерства региона на основе официальных данных Стратегии-2036 и карточки региона.</p>
-        </header>
+        <!-- Слайд 2: Разделитель -->
+        <div class="slide">
+            <div class="slide-content section-divider">
+                <h2>Часть I</h2>
+                <p>Прообраз кадровой стратегии региона</p>
+            </div>
+        </div>
 
-        <!-- 1. Профиль -->
-        <section>
-            <h2>1. Социально-экономический профиль</h2>
-            <div class="grid-stats">
-                <div class="stat-card">
-                    <div class="stat-label">Население на 01.01.2025</div>
-                    <div class="stat-value"><span class="counter" data-target="1455.9">0</span><span class="stat-unit"> тыс.</span></div>
-                    <div class="stat-trend trend-down">▼ Минус 15,2 тыс. за 2024</div>
+        <!-- Слайд 3: Профиль региона (Кадры) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>1. Социально-экономический профиль</h2>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">1 455,9 тыс.</div><div class="stat-label">Население (снижение на 15,2 тыс. за 2024)</div></div>
+                    <div class="stat-card"><div class="stat-value">1,3 трлн ₽</div><div class="stat-label">ВРП (рост 4,5%)</div></div>
+                    <div class="stat-card"><div class="stat-value">120+ проектов</div><div class="stat-label">Инвестиции на 590 млрд ₽</div></div>
+                    <div class="stat-card"><div class="stat-value">33 250</div><div class="stat-label">Студентов в 6 вузах</div></div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">ВРП (2024)</div>
-                    <div class="stat-value"><span class="counter" data-target="1.3" data-decimals="1">0</span><span class="stat-unit"> трлн ₽</span></div>
-                    <div class="stat-trend trend-up">▲ Рост на 4,5% к 2023</div>
+                <p>Регион — исторический центр машиностроения, металлургии и химии. Промышленный и оборонно-промышленный каркас формирует устойчивый спрос на инженерные и рабочие кадры. Ресурсная база высшей школы: 6 вузов, приём на бюджет — 2 447 человек.</p>
+            </div>
+        </div>
+
+        <!-- Слайд 4: Рынок труда и дисбаланс -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>2. Рынок труда: структурный дисбаланс</h2>
+                <div class="grid-2">
+                    <div class="stat-card gold-border">
+                        <div class="stat-value">26 125 чел.</div>
+                        <div class="stat-label">Текущая потребность на 01.10.2026</div>
+                        <p style="margin-top: 10px;">При численности безработных всего 9,9 тыс. человек. Дефицит носит структурный характер.</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--danger);">Δ -42,6 тыс.</div>
+                        <div class="stat-label">Миграционный отток (2025)</div>
+                        <p style="margin-top: 10px;">Отток — 46,3 тыс. человек, приток — лишь 3,7 тыс. Главная причина: притяжение московской агломерации.</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Инвестиции (2025)</div>
-                    <div class="stat-value"><span class="counter" data-target="306.7">0</span><span class="stat-unit"> млрд ₽</span></div>
-                    <div class="stat-trend trend-up">▲ Рост на 2,0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Средняя зарплата (2025)</div>
-                    <div class="stat-value"><span class="counter" data-target="84.2">0</span><span class="stat-unit"> тыс. ₽</span></div>
-                    <div class="stat-trend trend-up">▲ В 1,9 раза к 2021</div>
+                <div class="highlight-box">
+                    <strong>Открытая база «Работа России»:</strong> 7 772 вакансии. <strong>hh Статистика:</strong> 10 442 вакансии, 57 940 резюме, индекс 5,5. Требования: СПО — 38 из 100 записей, без опыта — 66 из 100.
                 </div>
             </div>
-            
-            <h3 class="block-title">Прогноз ключевых показателей до 2036 года</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Показатель</th>
-                            <th>2025 (оценка)</th>
-                            <th>2030 (конс.)</th>
-                            <th>2030 (базовый)</th>
-                            <th>2036 (конс.)</th>
-                            <th>2036 (базовый)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Население, тыс. чел.</strong></td>
-                            <td>1 449,4</td>
-                            <td>1 376,9</td>
-                            <td>1 381,3</td>
-                            <td>1 294,4</td>
-                            <td>1 310,0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ВРП, млрд ₽</strong></td>
-                            <td>1 447,6</td>
-                            <td>1 930,4</td>
-                            <td>2 008,5</td>
-                            <td>2 814,5</td>
-                            <td>3 070,0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Промышленность, млрд ₽</strong></td>
-                            <td>2 248,9</td>
-                            <td>2 811,5</td>
-                            <td>2 923,2</td>
-                            <td>3 751,6</td>
-                            <td>4 086,4</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Инвестиции, млрд ₽</strong></td>
-                            <td>306,7</td>
-                            <td>390,3</td>
-                            <td>406,8</td>
-                            <td>530,1</td>
-                            <td>573,3</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        </div>
 
-            <p>Регион — исторический центр машиностроения, металлургии и химии. Промышленный и оборонно-промышленный каркас формирует устойчивый спрос на инженерные и рабочие кадры. Доля обрабатывающих производств в ВРП — 42,3%, регион занимает 9-е место в РФ и 3-е в ЦФО по выпуску обрабатывающей промышленности (2,4% от общероссийского).</p>
-            <p>Инфраструктура развития: ОЭЗ «Узловая», ИНТЦ «Композитная долина», ТОР «Ефремов», ТОР «Алексин», 5 моногородов (Алексин, Ефремов, Кимовск, Белев, Первомайский), 8 опорных населенных пунктов (Тула, Киреевск, Щекино, Алексин, Ефремов, Узловая, Донской, Новомосковск).</p>
-        </section>
-
-        <!-- 2. Рынок труда -->
-        <section>
-            <h2>2. Государственные программы и рынок труда</h2>
-            <div class="grid-stats" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="stat-card">
-                    <div class="stat-label">Вакансии (Трудвсем)</div>
-                    <div class="stat-value"><span class="counter" data-target="7772">0</span></div>
+        <!-- Слайд 5: Подготовка кадров -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>3. Система подготовки кадров</h2>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">33 250</div><div class="stat-label">Студентов вузов (заочно — 14 626)</div></div>
+                    <div class="stat-card"><div class="stat-value">29</div><div class="stat-label">Колледжей (24 тыс. студентов)</div></div>
+                    <div class="stat-card"><div class="stat-value">15</div><div class="stat-label">Кластеров «Профессионалитета»</div></div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Вакансии (hh)</div>
-                    <div class="stat-value"><span class="counter" data-target="10442">0</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">hh.индекс</div>
-                    <div class="stat-value"><span class="counter" data-target="5.5" data-decimals="1">0</span></div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Крупнейшие вузы</h3>
+                        <ul>
+                            <li>ТулГУ (1 556 бюджетных мест).</li>
+                            <li>ТГПУ им. Л.Н. Толстого (669).</li>
+                            <li>НИ РХТУ им. Д.И. Менделеева (181).</li>
+                            <li>Средний балл ЕГЭ — 61,9–79,3.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>СПО и целевое обучение</h3>
+                        <ul>
+                            <li>40% бюджетных мест — машиностроение.</li>
+                            <li>1 016 договоров о целевом обучении (2026).</li>
+                            <li>Занятость выпускников СПО: 93,18% (2024), 85,58% (2025), 62,19% (2026).</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            
-            <h3 class="block-title">Трудовые ресурсы и занятость (консервативный сценарий)</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Показатель, тыс. чел.</th>
-                            <th>2024</th>
-                            <th>2025</th>
-                            <th>2026</th>
-                            <th>2027</th>
-                            <th>2030</th>
-                            <th>2036</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Трудовые ресурсы</strong></td>
-                            <td>878,8</td>
-                            <td>867,7</td>
-                            <td>852,6</td>
-                            <td>845,6</td>
-                            <td>851,8</td>
-                            <td>851,8</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Трудоспособное население</strong></td>
-                            <td>753,9</td>
-                            <td>750,8</td>
-                            <td>749,0</td>
-                            <td>745,0</td>
-                            <td>749,0</td>
-                            <td>754,5</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Занятые в экономике</strong></td>
-                            <td>741,9</td>
-                            <td>742,9</td>
-                            <td>729,5</td>
-                            <td>730,1</td>
-                            <td>733,0</td>
-                            <td>734,6</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Уровень безработицы, %</strong></td>
-                            <td>2,1</td>
-                            <td>1,76</td>
-                            <td>2,06</td>
-                            <td>1,96</td>
-                            <td>1,77</td>
-                            <td>1,75</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        </div>
 
-            <h3 class="block-title">Кадровая потребность (тыс. чел.)</h3>
-            <div class="charts-grid">
-                <div class="chart-box">
-                    <div class="chart-title">Текущая потребность на 01.10.2026</div>
-                    <div style="font-size: 3rem; font-family: Georgia, serif; color: var(--accent-gold);">26 125</div>
-                    <p style="margin-top: 15px;">При численности безработных 9,9 тыс. чел. Структурный разрыв.</p>
-                </div>
-                <div class="chart-box">
-                    <div class="chart-title">Перспективная потребность (тыс. чел.)</div>
-                    <svg viewBox="0 0 300 200" class="svg-container bar-chart">
-                        <line x1="30" y1="170" x2="280" y2="170" class="svg-axis"></line>
-                        <rect x="40" y="170" width="35" height="0" fill="var(--accent-steel)" class="anim-bar" data-y="30" data-h="140"></rect>
-                        <text x="57" y="190" text-anchor="middle" class="svg-label">2027</text>
-                        <text x="57" y="20" text-anchor="middle" class="svg-value">742,1</text>
-
-                        <rect x="90" y="170" width="35" height="0" fill="var(--accent-steel)" class="anim-bar" data-y="35" data-h="135"></rect>
-                        <text x="107" y="190" text-anchor="middle" class="svg-label">2028</text>
-                        <text x="107" y="25" text-anchor="middle" class="svg-value">739,0</text>
-
-                        <rect x="140" y="170" width="35" height="0" fill="var(--accent-steel)" class="anim-bar" data-y="40" data-h="130"></rect>
-                        <text x="157" y="190" text-anchor="middle" class="svg-label">2029</text>
-                        <text x="157" y="30" text-anchor="middle" class="svg-value">738,3</text>
-
-                        <rect x="190" y="170" width="35" height="0" fill="var(--accent-gold)" class="anim-bar" data-y="45" data-h="125"></rect>
-                        <text x="207" y="190" text-anchor="middle" class="svg-label">2030</text>
-                        <text x="207" y="35" text-anchor="middle" class="svg-value" style="fill: var(--accent-gold);">735,6</text>
-                        
-                        <rect x="240" y="170" width="35" height="0" fill="var(--accent-gold)" class="anim-bar" data-y="50" data-h="120"></rect>
-                        <text x="257" y="190" text-anchor="middle" class="svg-label">2032</text>
-                        <text x="257" y="40" text-anchor="middle" class="svg-value" style="fill: var(--accent-gold);">727,2</text>
-                    </svg>
+        <!-- Слайд 6: HR 4.0 -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>4. Цифровые технологии управления персоналом (HR 4.0)</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Методика «Сенеж»</h3>
+                        <ul>
+                            <li>Пятимерный каркас компетенций, 24 практики.</li>
+                            <li>Анкета цифровой готовности (49 вопросов).</li>
+                            <li>Уровни зрелости ИИ: 2–3 (стратегический агент).</li>
+                            <li>Готовность региона не оценена (выборка не набрана).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Структура спроса</h3>
+                        <ul>
+                            <li>ИТ и ИБ — 32 вакансии (программист 32, сисадмин 23).</li>
+                            <li>Аналитик данных — 8 вакансий.</li>
+                            <li>Охрана труда — 36, кадры — 17, менеджер по персоналу — 3.</li>
+                            <li>Цифровой и управленческий контур недооценён.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <p>Замещающая потребность: 2027 — 11 290 чел., 2028 — 12 590, 2029 — 13 630, 2030 — 11 800, 2031 — 8 850, 2032 — 11 610. Миграция: отток 46,3 тыс., приток 3,7 тыс. (Δ -42,6 тыс.).</p>
-        </section>
+        </div>
 
-        <!-- 3. Подготовка кадров -->
-        <section>
-            <h2>3. Система подготовки кадров</h2>
-            <div class="grid-stats">
-                <div class="stat-card">
-                    <div class="stat-label">Студенты Вузов</div>
-                    <div class="stat-value"><span class="counter" data-target="33250">0</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Приём на бюджет</div>
-                    <div class="stat-value"><span class="counter" data-target="2447">0</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Студенты СПО</div>
-                    <div class="stat-value"><span class="counter" data-target="24000">0</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Колледжей и техникумов</div>
-                    <div class="stat-value"><span class="counter" data-target="29">0</span></div>
+        <!-- Слайд 7: Отраслевые разрывы -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>5. Отраслевые кадровые разрывы</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Отрасль</th><th>Суть разрыва</th><th>Срок</th><th>Тип</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Здравоохранение</td><td>Дефицит врачей и среднего медперсонала (332 вакансии)</td><td>Уже наступил</td><td>Общий для РФ</td></tr>
+                            <tr><td>Промышленность</td><td>Нехватка инженеров и рабочих (164 вакансии)</td><td>2026–2028</td><td>Общий для РФ</td></tr>
+                            <tr><td>АПК</td><td>Дефицит механизаторов, ветеринаров, агроинженеров</td><td>2026–2030</td><td><span style="color: var(--accent-gold);">Уникальный</span></td></tr>
+                            <tr><td>Рабочие кадры</td><td>СПО доминирует в структуре требований</td><td>Уже наступил</td><td>Общий для РФ</td></tr>
+                            <tr><td>Межотраслевой</td><td>Общий дефицит рабочей силы (hh.индекс 5,5)</td><td>Уже наступил</td><td>Общий для РФ</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            
-            <h3 class="block-title">Структура студентов по формам обучения (33 250 чел.)</h3>
-            <div class="chart-box" style="margin-bottom: 40px;">
-                <div class="chart-title">Распределение по формам обучения</div>
-                <svg viewBox="0 0 400 220" class="svg-container bar-chart" preserveAspectRatio="xMidYMid meet">
-                    <line x1="40" y1="190" x2="380" y2="190" class="svg-axis"></line>
-                    
-                    <!-- Очно (15 920) -->
-                    <rect x="70" y="190" width="60" height="0" fill="var(--chart-1)" class="anim-bar" data-y="30" data-h="160"></rect>
-                    <text x="100" y="210" text-anchor="middle" class="svg-label">Очно</text>
-                    <text x="100" y="20" text-anchor="middle" class="svg-value" style="fill: var(--accent-gold);">15 920</text>
+        </div>
 
-                    <!-- Очно-заочно (2 704) -->
-                    <rect x="170" y="190" width="60" height="0" fill="var(--chart-2)" class="anim-bar" data-y="163" data-h="27"></rect>
-                    <text x="200" y="210" text-anchor="middle" class="svg-label">Очно-заочно</text>
-                    <text x="200" y="153" text-anchor="middle" class="svg-value">2 704</text>
-
-                    <!-- Заочно (14 626) -->
-                    <rect x="270" y="190" width="60" height="0" fill="var(--chart-3)" class="anim-bar" data-y="43" data-h="147"></rect>
-                    <text x="300" y="210" text-anchor="middle" class="svg-label">Заочно</text>
-                    <text x="300" y="33" text-anchor="middle" class="svg-value">14 626</text>
-                </svg>
-            </div>
-
-            <p>Крупнейшие вузы: ТулГУ (1 556 бюджетных мест), ТГПУ им. Л.Н. Толстого (669), НИ РХТУ им. Д.И. Менделеева (181). Средний балл ЕГЭ — 61,9–79,3.</p>
-            <p>СПО: 29 колледжей и техникумов, 100+ специальностей, ежегодно поступает ~8 тыс. человек. 40% бюджетных мест — машиностроение. 70,2% — специалисты среднего звена. В рамках «Профессионалитета» создано 15 кластеров (3 машиностроения, 3 химии, 1 ИКТ, 2 сельского хозяйства, 1 электротехнической промышленности), 70+ работодателей, 10 тыс. специалистов к 2026 году, инвестиции 2,4 млрд ₽.</p>
-            <p>Целевое обучение: 1 016 договоров в 2026 году. Занятость выпускников СПО: 2024 — 93,18%, 2025 — 85,58%, 2026 — 62,19% (снижение из-за роста числа выпусков). КЦП СПО: 2024 — 7 573, 2025 — 7 866, 2026 — 7 959.</p>
-            <p>Молодёжь: 328 тыс. человек (14–35 лет, 22% населения). 645 первичных отделений «Движения Первых», 120 тыс. участников (38% молодёжи). Гранты на поддержку инициатив — 500 тыс. ₽ на человека, бюджет программы — 5 млн ₽.</p>
-        </section>
-
-        <!-- 4. HR 4.0 -->
-        <section>
-            <h2>4. Цифровые технологии управления персоналом</h2>
-            <div class="problem-grid">
-                <div class="problem-card">
-                    <h3 class="problem-title">Методика «Сенеж»</h3>
-                    <p class="problem-desc">Пятимерный каркас компетенций, 24 прикладные практики, анкета цифровой готовности из 7 блоков (49 вопросов). Уровни зрелости ИИ: 2–3 (стратегический агент и мультиагентные системы).</p>
-                </div>
-                <div class="problem-card">
-                    <h3 class="problem-title">Готовность региона</h3>
-                    <p class="problem-desc">По области выборка организаций не набрана — значение не выводится искусственно (честный прочерк). Это ограничивает оценку цифровой зрелости кадровой сферы.</p>
+        <!-- Слайд 8: Обоснованность данных -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>6. Обоснованность данных</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--success);">Подтверждено</h3>
+                        <ul>
+                            <li>Вакансии региона: 7 772 (Трудвсем).</li>
+                            <li>Рынок hh: 10 442 вакансии, 57 940 резюме, индекс 5,5.</li>
+                            <li>Студенты: 33 250; бюджетный приём — 2 447.</li>
+                            <li>Инвестиции: 120+ проектов на 590 млрд ₽.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--danger);">Требует проверки</h3>
+                        <ul>
+                            <li>КЦП и выпуск по направлениям подготовки.</li>
+                            <li>Прогноз «регион × отрасль × профессия» (Минтруд).</li>
+                            <li>Готовность к HR 4.0 (выборка не набрана).</li>
+                            <li>Полный ИВР молодёжи (нет опросных данных).</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <p>Цифровой спрос: ИТ и ИБ — 32 вакансии (программист 32, сисадмин 23, аналитик данных 8). Управленческий контур: охрана труда — 36, кадры — 17, менеджер по персоналу — 3. Структура спроса свидетельствует о недооценке цифрового и управленческого контура относительно торговли и рабочих позиций.</p>
-        </section>
+        </div>
 
-        <!-- 5. Разрывы -->
-        <section>
-            <h2>5. Отраслевые кадровые разрывы</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Отрасль</th>
-                            <th>Суть разрыва</th>
-                            <th>Причина</th>
-                            <th>Срок</th>
-                            <th>Квалификация</th>
-                            <th>Тип</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Здравоохранение</strong></td>
-                            <td>Дефицит врачей и среднего медперсонала (332 вакансии)</td>
-                            <td>Старение; отток среднего персонала в Москву; низкие стартовые зарплаты</td>
-                            <td>Уже наступил</td>
-                            <td>Высшее, СПО</td>
-                            <td><span class="badge general">Общий для РФ</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Промышленность и ОПК</strong></td>
-                            <td>Нехватка инженеров и рабочих (164 вакансии)</td>
-                            <td>Промышленный каркас при сужающейся базе СПО; конкуренция с Москвой</td>
-                            <td>2026–2028</td>
-                            <td>СПО, высшее</td>
-                            <td><span class="badge general">Общий для РФ</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>АПК</strong></td>
-                            <td>Дефицит механизаторов, ветеринаров, агроинженеров</td>
-                            <td>Миграция сельской молодёжи в города; сезонность; уровень оплаты</td>
-                            <td>2026–2030</td>
-                            <td>СПО, высшее</td>
-                            <td><span class="badge unique">Уникальный</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Рабочие кадры</strong></td>
-                            <td>СПО доминирует в структуре требований (38 из 100)</td>
-                            <td>Снижение престижа; конкуренция с логистикой и маркетплейсами</td>
-                            <td>Уже наступил</td>
-                            <td>СПО, общее</td>
-                            <td><span class="badge general">Общий для РФ</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Межотраслевой</strong></td>
-                            <td>Общий дефицит рабочей силы (hh.индекс 5,5)</td>
-                            <td>Демографическое сужение; отток в Московскую агломерацию</td>
-                            <td>Уже наступил</td>
-                            <td>Разная</td>
-                            <td><span class="badge general">Общий для РФ</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- 6. Обоснованность -->
-        <section>
-            <h2>6. Обоснованность данных</h2>
-            <div class="problem-grid">
-                <div class="problem-card" style="border-top-color: var(--success);">
-                    <h3 class="problem-title">Подтверждено</h3>
-                    <ul>
-                        <li>Вакансии региона: 7 772 (Трудвсем)</li>
-                        <li>Рынок hh: 10 442 вакансии, 57 940 резюме, индекс 5,5</li>
-                        <li>Студенты: 33 250; бюджетный приём — 2 447 (Минобрнауки)</li>
-                        <li>Инвестиции: 120+ проектов на 590 млрд ₽</li>
-                    </ul>
-                </div>
-                <div class="problem-card" style="border-top-color: var(--danger);">
-                    <h3 class="problem-title">Требует проверки</h3>
-                    <ul>
-                        <li>КЦП и выпуск по направлениям подготовки</li>
-                        <li>Прогноз «регион × отрасль × профессия» (Минтруд)</li>
-                        <li>Готовность к HR 4.0 (выборка не набрана)</li>
-                        <li>Полный ИВР молодёжи (нет опросных данных)</li>
-                    </ul>
+        <!-- Слайд 9: Межрегионка (Кадры) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>7. Межрегиональное партнерство</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Направление</th><th>Соседи</th><th>Совместное решение</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Агломерационное притяжение</td><td>Московская область</td><td>Согласование закрепляющих мер: жильё, целевые контракты</td></tr>
+                            <tr><td>Промышленный контур</td><td>Калужская, Липецкая, Орловская</td><td>Сетевые образовательно-производственные кластеры</td></tr>
+                            <tr><td>Аграрный контур</td><td>Липецкая, Рязанская, Орловская</td><td>Совместные агроклассы и программы СПО</td></tr>
+                            <tr><td>Образовательный хаб</td><td>Липецкая, Рязанская</td><td>Сетевые программы «вуз-хаб — регион-заказчик»</td></tr>
+                            <tr><td>Единая рамка ЦФО</td><td>Регионы ЦФО</td><td>Единая цифровая база мониторинга трудоустройства</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- 7. Межрегионка -->
-        <section>
-            <h2>7. Межрегиональное партнерство</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Направление</th>
-                            <th>Соседи</th>
-                            <th>Общий вызов</th>
-                            <th>Взаимодополнение</th>
-                            <th>Совместное решение</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Агломерационное притяжение</strong></td>
-                            <td>Московская область</td>
-                            <td>Вымывание кадров в московскую агломерацию</td>
-                            <td>Транспортная и образовательная взаимосвязь</td>
-                            <td>Согласование закрепляющих мер: жильё, целевые контракты</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Промышленный контур</strong></td>
-                            <td>Калужская, Липецкая, Орловская</td>
-                            <td>Кадры для обрабатывающей промышленности</td>
-                            <td>Общие цепочки поставок и кооперация</td>
-                            <td>Сетевые образовательно-производственные кластеры</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Аграрный контур</strong></td>
-                            <td>Липецкая, Рязанская, Орловская</td>
-                            <td>Кадры для АПК, механизаторы и ветеринары</td>
-                            <td>Общая аграрная специализация</td>
-                            <td>Совместные агроклассы и программы СПО</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Образовательный хаб</strong></td>
-                            <td>Липецкая, Рязанская</td>
-                            <td>Неравномерность размещения вузов</td>
-                            <td>Область (33 250 студентов, 6 вузов)</td>
-                            <td>Сетевые программы «вуз-хаб — регион-заказчик»</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Единая рамка ЦФО</strong></td>
-                            <td>Регионы ЦФО</td>
-                            <td>Дефицит рабочей силы: hh.индекс 5,5</td>
-                            <td>Общая методика прогноза</td>
-                            <td>Единая цифровая база мониторинга трудоустройства</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- 8. Приоритеты -->
-        <section>
-            <h2>8. Стратегические приоритеты</h2>
-            <div class="grid-stats" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="stat-card" style="border-top: 3px solid var(--accent-gold);">
-                    <h3 style="margin-bottom: 15px; color: var(--accent-gold); font-size: 1.5rem;">Ставка</h3>
-                    <p class="stat-label" style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; text-transform: none; letter-spacing: 0;">Синхронизация подготовки с промзаказом</p>
-                    <p class="stat-label" style="text-transform: none; letter-spacing: 0; font-weight: normal; font-size: 0.95rem;">Подтверждённый разрыв (164 вакансии), ресурсная база (6 вузов, 29 колледжей), инвестиционный поток (590 млрд ₽).</p>
-                </div>
-                <div class="stat-card" style="border-top: 3px solid var(--accent-steel);">
-                    <h3 style="margin-bottom: 15px; color: var(--accent-steel); font-size: 1.5rem;">Удержание</h3>
-                    <p class="stat-label" style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; text-transform: none; letter-spacing: 0;">Удержание выпускников и молодёжи</p>
-                    <p class="stat-label" style="text-transform: none; letter-spacing: 0; font-weight: normal; font-size: 0.95rem;">hh.индекс 5,5 и притяжение Москвы. Заочная форма (14 626 из 33 250) — подготовка уже работающих, а не приток молодёжи.</p>
-                </div>
-                <div class="stat-card" style="border-top: 3px solid #8b9bb4;">
-                    <h3 style="margin-bottom: 15px; color: #8b9bb4; font-size: 1.5rem;">Развитие</h3>
-                    <p class="stat-label" style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; text-transform: none; letter-spacing: 0;">АПК и цифровой контур</p>
-                    <p class="stat-label" style="text-transform: none; letter-spacing: 0; font-weight: normal; font-size: 0.95rem;">АПК — единственный уникальный разрыв. Цифровой контур недооценён (ИТ — 32 вакансии при спросе на аналитику данных).</p>
+        <!-- Слайд 10: Приоритеты (Кадры) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>8. Стратегические приоритеты кадровой политики</h2>
+                <div class="grid-3">
+                    <div class="stat-card gold-border">
+                        <h3>Ставка</h3>
+                        <p>Синхронизация подготовки с промзаказом. Подтверждённый разрыв (164 вакансии), ресурсная база (6 вузов, 29 колледжей), инвестпоток (590 млрд ₽).</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Удержание</h3>
+                        <p>hh.индекс 5,5 и притяжение Москвы. Заочная форма (14 626 из 33 250) — подготовка уже работающих, а не приток молодёжи.</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Развитие</h3>
+                        <p>АПК — единственный уникальный разрыв. Цифровой контур недооценён (ИТ — 32 вакансии при спросе на аналитику данных).</p>
+                    </div>
                 </div>
             </div>
-            <p>Пути решения: целевые договоры «колледж/вуз — предприятие»; закрепляющие меры (жильё, карьера, наставничество); общая база СПО и агроклассы; наращивание цифрового и управленческого контура. Обоснование выбора: разрыв подтверждён данными, регион способен на него повлиять, эффект измерим на среднесрочном горизонте.</p>
-        </section>
+        </div>
 
-        <!-- 9. Портфель -->
-        <section>
-            <h2>9. Портфель проектных инициатив</h2>
-            <div class="initiatives-grid">
-                <div class="initiative-card">
-                    <div class="initiative-num">01</div>
-                    <div class="initiative-title">Сеть «СПО/вуз — предприятие»</div>
-                    <div class="initiative-text">Целевые договоры, практика, наставники. Закрывает инженерный и рабочий дефицит.</div>
-                </div>
-                <div class="initiative-card">
-                    <div class="initiative-num">02</div>
-                    <div class="initiative-title">Центр опережающей переподготовки (ДПО)</div>
-                    <div class="initiative-text">Корпоративные программы и цифровые платформы учёта компетенций. Рост производительности.</div>
-                </div>
-                <div class="initiative-card">
-                    <div class="initiative-num">03</div>
-                    <div class="initiative-title">Программа закрепления выпускников</div>
-                    <div class="initiative-text">Жилищные и карьерные преференции, наставничество. Снижение оттока в Москву.</div>
-                </div>
-                <div class="initiative-card">
-                    <div class="initiative-num">04</div>
-                    <div class="initiative-title">Агроклассы и агропрофили СПО</div>
-                    <div class="initiative-text">Профильные классы и целевые договоры с агропредприятиями. Приток механизаторов и ветеринаров.</div>
-                </div>
-                <div class="initiative-card">
-                    <div class="initiative-num">05</div>
-                    <div class="initiative-title">Образовательно-производственные кластеры</div>
-                    <div class="initiative-text">«Колледж + работодатели», сокращённые программы под рабочие места. Приток рабочих кадров.</div>
-                </div>
-                <div class="initiative-card">
-                    <div class="initiative-num">06</div>
-                    <div class="initiative-title">Сетевые программы с вузами-хабами</div>
-                    <div class="initiative-text">Зачёт части единиц в вузе-хабе. Покрытие дефицита за счёт соседних образовательных баз.</div>
+        <!-- Слайд 11: Портфель (Кадры) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>9. Портфель проектных инициатив</h2>
+                <div class="grid-3">
+                    <div class="stat-card"><h3>01. Сеть «СПО/вуз — предприятие»</h3><p>Целевые договоры, практика, наставники. Закрывает инженерный и рабочий дефицит.</p></div>
+                    <div class="stat-card"><h3>02. Центр опережающей переподготовки</h3><p>Корпоративные программы ДПО и платформы учёта компетенций.</p></div>
+                    <div class="stat-card"><h3>03. Программа закрепления выпускников</h3><p>Жилищные и карьерные преференции. Снижение оттока в Москву.</p></div>
+                    <div class="stat-card"><h3>04. Агроклассы и агропрофили СПО</h3><p>Профильные классы и целевые договоры. Приток механизаторов и ветеринаров.</p></div>
+                    <div class="stat-card"><h3>05. Образовательно-производственные кластеры</h3><p>«Колледж + работодатели», сокращённые программы под рабочие места.</p></div>
+                    <div class="stat-card"><h3>06. Сетевые программы с вузами-хабами</h3><p>Зачёт части единиц в вузе-хабе. Покрытие дефицита за счёт соседей.</p></div>
                 </div>
             </div>
+        </div>
 
-            <h3 class="block-title">Крупнейшие инвестиционные проекты (создание рабочих мест)</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Проект</th>
-                            <th>Отрасль</th>
-                            <th>Инвестиции, млрд ₽</th>
-                            <th>Рабочие места</th>
-                            <th>Срок</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>АО «Полипласт»</strong></td>
-                            <td>Промышленность</td>
-                            <td>70,0</td>
-                            <td>700</td>
-                            <td>2030</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ООО «Хавейл Мотор Мануфэкчуринг Рус»</strong></td>
-                            <td>Автомобилестроение</td>
-                            <td>50,0</td>
-                            <td>1 000</td>
-                            <td>2027</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Группа «Черкизово»</strong></td>
-                            <td>АПК</td>
-                            <td>40,0</td>
-                            <td>3 000</td>
-                            <td>2028</td>
-                        </tr>
-                        <tr>
-                            <td><strong>АО «УК ЭФКО»</strong></td>
-                            <td>Пищевая промышленность</td>
-                            <td>10,0</td>
-                            <td>600</td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ООО «НПО Промет»</strong></td>
-                            <td>Промышленность</td>
-                            <td>7,0</td>
-                            <td>800</td>
-                            <td>2028</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ООО «Халмек Литиум»</strong></td>
-                            <td>Химия</td>
-                            <td>3,65</td>
-                            <td>135</td>
-                            <td>—</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ООО «Инновационные технологии и материалы»</strong></td>
-                            <td>Химия</td>
-                            <td>6,0</td>
-                            <td>120</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- ================= ЧАСТЬ 2: СТРАТЕГИЯ СЭР ================= -->
+
+        <!-- Слайд 12: Разделитель -->
+        <div class="slide">
+            <div class="slide-content section-divider">
+                <h2>Часть II</h2>
+                <p>Стратегия социально-экономического развития до 2036 года</p>
             </div>
-        </section>
+        </div>
 
-        <footer>
-            <p><strong>Основание:</strong> Стратегия социально-экономического развития Тульской области до 2036 года (Постановление Правительства Тульской области), Карточка региона, данные Банка России, Росстата, hh Статистика и портала «Работа России».</p>
-            <p>© Программа «Кадры для экономики будущего»</p>
-        </footer>
+        <!-- Слайд 13: Общая характеристика -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>10. Общая характеристика региона</h2>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">1,457 млн</div><div class="stat-label">Население (около 1% РФ)</div></div>
+                    <div class="stat-card"><div class="stat-value">1,3 трлн ₽</div><div class="stat-label">ВРП 2024 (рост 4,5%)</div></div>
+                    <div class="stat-card"><div class="stat-value">2,2 трлн ₽</div><div class="stat-label">Промышленность 2025 (ИПП 108,5%)</div></div>
+                    <div class="stat-card"><div class="stat-value">306,7 млрд ₽</div><div class="stat-label">Инвестиции 2025 (+2,0%)</div></div>
+                </div>
+                <p>Регион — исторический центр машиностроения, металлургии и химии. Доля обрабатывающих производств в ВРП — 42,3%. По выпуску обрабатывающей промышленности регион занимает <strong>9-е место в РФ и 3-е в ЦФО</strong> (2,4% от общероссийского объема).</p>
+            </div>
+        </div>
+
+        <!-- Слайд 14: Консервативный сценарий -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>11. Сценарии: Консервативный прогноз</h2>
+                <p>Инерционный сценарий предполагает сохранение санкционного давления, ограниченный прогресс в импортозамещении и умеренные темпы реализации проектов.</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Показатель</th><th>2024</th><th>2025</th><th>2030</th><th>2036</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Население, тыс. чел.</td><td>1 464,0</td><td>1 449,4</td><td>1 376,9</td><td>1 294,4</td></tr>
+                            <tr><td>ВРП, млрд ₽</td><td>1 304,9</td><td>1 447,6</td><td>1 930,4</td><td>2 814,5</td></tr>
+                            <tr><td>Промышленность, млрд ₽</td><td>1 906,1</td><td>2 248,9</td><td>2 811,5</td><td>3 751,6</td></tr>
+                            <tr><td>Сельское хозяйство, млрд ₽</td><td>124,0</td><td>148,6</td><td>185,8</td><td>272,9</td></tr>
+                            <tr><td>Инвестиции, млрд ₽</td><td>272,9</td><td>306,7</td><td>390,3</td><td>530,1</td></tr>
+                            <tr><td>Занятые, тыс. чел.</td><td>741,9</td><td>742,9</td><td>733,0</td><td>734,6</td></tr>
+                            <tr><td>Безработица, %</td><td>2,11</td><td>1,76</td><td>1,77</td><td>1,75</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 15: Базовый сценарий -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>12. Сценарии: Базовый прогноз</h2>
+                <p>Базовый сценарий опирается на амбициозную реализацию нацпроектов, привлечение инвестиций, импортозамещение и трансфер технологий из ОПК в гражданский сектор.</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Показатель</th><th>2024</th><th>2025</th><th>2030</th><th>2036</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Население, тыс. чел.</td><td>1 464,0</td><td>1 449,4</td><td>1 381,3</td><td>1 310,0</td></tr>
+                            <tr><td>ВРП, млрд ₽</td><td>1 304,9</td><td>1 447,6</td><td>2 008,5</td><td>3 070,0</td></tr>
+                            <tr><td>Промышленность, млрд ₽</td><td>1 906,1</td><td>2 248,9</td><td>2 923,2</td><td>4 086,4</td></tr>
+                            <tr><td>Сельское хозяйство, млрд ₽</td><td>124,0</td><td>148,6</td><td>195,2</td><td>305,7</td></tr>
+                            <tr><td>Инвестиции, млрд ₽</td><td>272,9</td><td>306,7</td><td>406,8</td><td>573,3</td></tr>
+                            <tr><td>Занятые, тыс. чел.</td><td>741,9</td><td>742,9</td><td>754,9</td><td>757,9</td></tr>
+                            <tr><td>Безработица, %</td><td>2,11</td><td>1,76</td><td>1,72</td><td>1,69</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 16: Демография -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>13. Демография и семейная политика</h2>
+                <p>Депопуляция — ключевой вызов. С 1990 года население сократилось с 1,86 до 1,46 млн человек. Общий коэффициент рождаемости (6,0) ниже среднероссийского (8,4).</p>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">1,13</div><div class="stat-label">Суммарный коэффициент рождаемости (2024)</div></div>
+                    <div class="stat-card"><div class="stat-value">73,16 лет</div><div class="stat-label">Ожидаемая продолжительность жизни</div></div>
+                    <div class="stat-card"><div class="stat-value">28%</div><div class="stat-label">Доля пожилого населения</div></div>
+                    <div class="stat-card"><div class="stat-value">3,8</div><div class="stat-label">Младенческая смертность (на 1000)</div></div>
+                </div>
+                <ul>
+                    <li><strong>Финансы:</strong> Областной маткапитал до 150 тыс. руб. Единовременная выплата 1 млн руб. женщинам до 25/28 лет.</li>
+                    <li><strong>Инфраструктура:</strong> 6 женских консультаций, дооснащение перинатального центра, ЭКО по ОМС.</li>
+                    <li><strong>Стандарты:</strong> Региональный демографический стандарт для работодателей.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Слайд 17: Здравоохранение -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>14. Здравоохранение</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Ключевые показатели</h3>
+                        <ul>
+                            <li>Обеспеченность врачами: 41,9 на 10 тыс. (в РФ — 51,9).</li>
+                            <li>11,5 тыс. коек, 40 тыс. посещений в смену.</li>
+                            <li>Заболеваемость ниже среднероссийской на 4–10%.</li>
+                            <li>В отрасли занято около 6% работающего населения.</li>
+                        </ul>
+                        <h3>Модернизация</h3>
+                        <ul>
+                            <li>Реконструкция Тульской областной больницы.</li>
+                            <li>Строительство корпуса больницы им. Д.Я. Ванькина.</li>
+                            <li>Проект «КардиоРитм».</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Кадры и профилактика</h3>
+                        <ul>
+                            <li>Стимулирующие выплаты и жилье для медиков.</li>
+                            <li>Привлечение врачей «вахтовым методом».</li>
+                            <li>Увеличение числа лиц, получивших медреабилитацию (+26,5% к 2030).</li>
+                            <li>Обеспечение детей с диабетом системами мониторинга глюкозы.</li>
+                            <li>Скрининг на гепатит С для граждан 25+.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 18: Образование -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>15. Образование</h2>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">220</div><div class="stat-label">Детских садов</div></div>
+                    <div class="stat-card"><div class="stat-value">460</div><div class="stat-label">Школ (146 тыс. учеников)</div></div>
+                    <div class="stat-card"><div class="stat-value">29</div><div class="stat-label">Колледжей (24 тыс. студентов)</div></div>
+                    <div class="stat-card"><div class="stat-value">15</div><div class="stat-label">Кластеров «Профессионалитета»</div></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Инфраструктура</h3>
+                        <ul>
+                            <li>181 «Точка роста», 11 «Кванториумов», 5 «IT-кубов».</li>
+                            <li>700+ профильных классов.</li>
+                            <li>Охват допобразованием — 90,2%.</li>
+                            <li>«Профессионалитет»: 70+ работодателей, инвестиции 2,4 млрд руб.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Кадры</h3>
+                        <ul>
+                            <li>42,5 тыс. работников (20 тыс. педагогов).</li>
+                            <li>Укомплектованность — 96%.</li>
+                            <li>Проект «ПРОстажер» (304 студента).</li>
+                            <li>Средний возраст учителя — 46 лет.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 19: Молодежь и СВО -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>16. Молодежная политика и поддержка СВО</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Молодежь</h3>
+                        <ul>
+                            <li>328 тыс. человек (22% населения).</li>
+                            <li>645 отделений «Движения Первых» (120 тыс. участников).</li>
+                            <li>Гранты до 500 тыс. руб. (бюджет 5 млн руб.).</li>
+                            <li>Форумы: «Инженеры будущего», «Дикая мята», «Зарница 2.0».</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Поддержка СВО</h3>
+                        <ul>
+                            <li>Центр «Герой 71» и 5 филиалов.</li>
+                            <li>74% участников СВО трудоустроены.</li>
+                            <li>Компенсация 95% стоимости платного обучения.</li>
+                            <li>Бесплатное второе СПО, персональное сопровождение.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 20: Промышленность (структура) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>17. Промышленность: структура и динамика</h2>
+                <p>Занято 198,8 тыс. человек (26,8% всех занятых). Производительность труда в 1,9 раза выше средней по региону. ИПП в 2024 году — 109,2% (в РФ — 105,6%).</p>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card gold-border"><div class="stat-value">26,5%</div><div class="stat-label">Готовые металлические изделия</div></div>
+                    <div class="stat-card"><div class="stat-value">13,3%</div><div class="stat-label">Химические вещества</div></div>
+                    <div class="stat-card"><div class="stat-value">12,6%</div><div class="stat-label">Автотранспортные средства</div></div>
+                    <div class="stat-card"><div class="stat-value">11,0%</div><div class="stat-label">Пищевые продукты</div></div>
+                    <div class="stat-card"><div class="stat-value">10,8%</div><div class="stat-label">Металлургия</div></div>
+                    <div class="stat-card"><div class="stat-value">3,6%</div><div class="stat-label">Компьютеры и электроника</div></div>
+                </div>
+                <div class="highlight-box">
+                    <strong>Крупнейшие предприятия:</strong> КБП им. Шипунова, Туламашзавод, НПО «Сплав», НАК «Азот», «Полипласт Новомосковск», «Щекиноазот», «Тулачермет», «Хавейл Мотор Мануфэкчуринг Рус».
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 21: ОПК и химия -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>18. ОПК и химическая промышленность</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>ОПК (более 30% промпроизводства)</h3>
+                        <ul>
+                            <li>20 крупных предприятий, около 40 тыс. занятых.</li>
+                            <li>Индекс производства за 2024 год — 119,6%.</li>
+                            <li>Объем отгрузки превысил 500 млрд руб. (+50%).</li>
+                            <li>За 10 месяцев 2025 года рост производства — более 30%.</li>
+                            <li>Лидеры по поставкам в рамках гособоронзаказа.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Химия (около 13%)</h3>
+                        <ul>
+                            <li>Азотные удобрения, метанол, каучук, пластмассы.</li>
+                            <li>1-е место по экспорту среди отраслей (Китай, Турция, Индия).</li>
+                            <li>«Полипласт Новомосковск»: 17 млрд руб., 650 мест.</li>
+                            <li>«Щекиноазот»: 15 млрд руб., 145 мест.</li>
+                            <li>«НАК Азот»: сжиженная углекислота (1,034 млрд руб.).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 22: Автопром, металлургия, БАС -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>19. Автопром, металлургия и БАС</h2>
+                <div class="grid-3">
+                    <div>
+                        <h3>Автомобилестроение (>12%)</h3>
+                        <ul>
+                            <li>«Хавейл» — 2-й автозавод в РФ (130 тыс. авто в 2024).</li>
+                            <li>Инвестиции в двигатели и компоненты — 50 млрд руб. до 2027 года.</li>
+                            <li>Локализация по СПИК.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Металлургия (~11%)</h3>
+                        <ul>
+                            <li>6 крупных предприятий (11 тыс. занятых).</li>
+                            <li>Чугун, прокат, ферросплавы.</li>
+                            <li>«Тулачермет», «Промсорт-Тула», «Косогорский МЗ», «ЕВРАЗ».</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>БАС и новые материалы</h3>
+                        <ul>
+                            <li>НПЦ БАС «ТулаДрон» (один из 10 крупнейших в РФ).</li>
+                            <li>10+ производителей, 2 тыс. изделий в день.</li>
+                            <li>ИНТЦ «Композитная долина» (7,2 млрд руб.).</li>
+                            <li>НОЦ «ТулаТЕХ» (23 лаборатории).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 23: АПК -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>20. Агропромышленный комплекс</h2>
+                <p>Около 1000 сельхозорганизаций, 160 предприятий пищевой промышленности (30 тыс. занятых).</p>
+                <div class="grid-2">
+                    <div>
+                        <h3>Достижения</h3>
+                        <ul>
+                            <li>Производство мяса выросло в 2,5 раза с 2016 года.</li>
+                            <li>Валовые сборы зерна выросли в 2,4 раза с 2011 года.</li>
+                            <li>2-е место в РФ по картофелю, лидер по рапсу и крахмалам.</li>
+                            <li>Посевная площадь: 806 тыс. га (2016) → 977,8 тыс. га (2025).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Инвестиции</h3>
+                        <ul>
+                            <li>Более 25 проектов на 100 млрд руб. (7 тыс. мест).</li>
+                            <li>«Черкизово-мясные продукты», «Куриное Царство Тула».</li>
+                            <li>«Тульский завод растительных масел».</li>
+                            <li>Господдержка — около 2 млрд руб. ежегодно.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 24: МСП и торговля -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>21. МСП и торговля</h2>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">55,7 тыс.</div><div class="stat-label">Субъектов МСП</div></div>
+                    <div class="stat-card"><div class="stat-value">49 млрд ₽</div><div class="stat-label">Закупки у МСП (+25%)</div></div>
+                    <div class="stat-card"><div class="stat-value">527,3 млрд ₽</div><div class="stat-label">Оборот розничной торговли (+12,2%)</div></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Поддержка МСП</h3>
+                        <ul>
+                            <li>Микрозаймы до 5 млн руб. (1–16%).</li>
+                            <li>Поручительства до 50% суммы кредита.</li>
+                            <li>Субсидии, налоговые каникулы, льготная аренда.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Торговля и ответственный бизнес</h3>
+                        <ul>
+                            <li>Развитие ярмарок и распределительных центров.</li>
+                            <li>ЭКГ-рейтинг (Экология-Кадры-Государство).</li>
+                            <li>Статус ответственного субъекта на 3 года.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 25: Инвестиции -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>22. Инвестиции и ОЭЗ</h2>
+                <p>Более 120 инвестпроектов на сумму свыше 580 млрд руб. (40 тыс. рабочих мест).</p>
+                <div class="grid-2">
+                    <div>
+                        <h3>Крупнейшие проекты</h3>
+                        <ul>
+                            <li><strong>«Полипласт»:</strong> 70 млрд ₽, 700 мест.</li>
+                            <li><strong>«Хавейл»:</strong> 50 млрд ₽, 1000 мест.</li>
+                            <li><strong>«Черкизово»:</strong> 40 млрд ₽, 3000 мест.</li>
+                            <li><strong>«ЭФКО»:</strong> 10 млрд ₽, 600 мест.</li>
+                            <li><strong>«НПО Промет»:</strong> 7 млрд ₽, 800 мест.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Инфраструктура</h3>
+                        <ul>
+                            <li>ОЭЗ «Узловая».</li>
+                            <li>ИНТЦ «Композитная долина».</li>
+                            <li>ТОР «Ефремов» и «Алексин».</li>
+                            <li>Около 250 площадок (гринфилд/браунфилд).</li>
+                            <li>Корпорация развития — «единое окно».</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 26: ЖКХ и энергетика -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>23. ЖКХ и энергетика</h2>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">89,3%</div><div class="stat-label">Газификация (РФ — 73%)</div></div>
+                    <div class="stat-card"><div class="stat-value">47%</div><div class="stat-label">Износ тепловых сетей (РФ >60%)</div></div>
+                    <div class="stat-card"><div class="stat-value">1596,2 МВт</div><div class="stat-label">Собственная генерация</div></div>
+                    <div class="stat-card"><div class="stat-value">1129</div><div class="stat-label">Лифтов к замене</div></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Модернизация</h3>
+                        <ul>
+                            <li>Очистные сооружения (Донской, Киреевск, Суворов).</li>
+                            <li>Станция водоподготовки в Липках.</li>
+                            <li>Реконструкция Масловско-Песоченского водозабора.</li>
+                            <li>РГИС «ПРИО» — цифровая платформа.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Электроэнергетика</h3>
+                        <ul>
+                            <li>Черепетская ГРЭС, Алексинская и Ефремовская ТЭЦ.</li>
+                            <li>Ввод 297 МВА, реконструкция 2325 км ЛЭП.</li>
+                            <li>Подстанция 500 кВ.</li>
+                            <li>Метод RAB для «Тулэнерго» (2023–2027).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 27: Транспорт -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>24. Транспорт и дорожное хозяйство</h2>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">>15 тыс. км</div><div class="stat-label">Дорог</div></div>
+                    <div class="stat-card"><div class="stat-value">52,2%</div><div class="stat-label">В нормативном состоянии (цель 58%)</div></div>
+                    <div class="stat-card"><div class="stat-value">99 млн</div><div class="stat-label">Пассажиров (2024, +13,5%)</div></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Развитие</h3>
+                        <ul>
+                            <li>408 автобусов, 22 трамвая, 6 троллейбусов.</li>
+                            <li>8 новых маршрутов (2024).</li>
+                            <li>ИТС: 145 умных светофоров, 13 АПВГК.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Проекты</h3>
+                        <ul>
+                            <li>Дороги ОЭЗ «Узловая» (1,9 млрд руб.).</li>
+                            <li>Тула — Новомосковск (7,3 млрд руб.).</li>
+                            <li>Восточный обход Тулы (9,6 млрд руб.).</li>
+                            <li>Продление МЦД до Тулы.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 28: Жилье -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>25. Жилье и городская среда</h2>
+                <div class="grid-4" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">1 104,7</div><div class="stat-label">Тыс. кв. м (2023, рекорд)</div></div>
+                    <div class="stat-card"><div class="stat-value">917</div><div class="stat-label">Тыс. кв. м (2024)</div></div>
+                    <div class="stat-card"><div class="stat-value">~1 млн</div><div class="stat-label">Кв. м (2025)</div></div>
+                    <div class="stat-card"><div class="stat-value">33 кв. м</div><div class="stat-label">Обеспеченность на человека</div></div>
+                </div>
+                <ul>
+                    <li>Досрочно завершена программа переселения из аварийного жилья (до 2017 года).</li>
+                    <li>183 тыс. семей улучшили условия с 2021 по 2024 год.</li>
+                    <li>Развитие ИЖС и льготных ипотечных программ.</li>
+                    <li>Благоустройство (парки, набережные), программы «Народный бюджет» и «Наш район».</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Слайд 29: Экология -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>26. Экология и безопасность</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Экология</h3>
+                        <ul>
+                            <li>Нацпарк «Тульские засеки» (5,8 тыс. га).</li>
+                            <li>6 ООПТ регионального значения.</li>
+                            <li>Ликвидирована 141 свалка, рекультивировано 12.</li>
+                            <li>Объем выбросов снизился в 6 раз с 1991 года.</li>
+                            <li>Расширение сети постов экомониторинга.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Безопасность и цифровизация</h3>
+                        <ul>
+                            <li>Снижение преступности на 7,7% (2024).</li>
+                            <li>Внедрение видеонаблюдения с ИИ.</li>
+                            <li>100% массовых услуг в электронном виде.</li>
+                            <li>97,87% обращений в электронном виде.</li>
+                            <li>Оценка качества услуг — 4,57 из 5.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 30: Кадры (СЭР) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>27. Рынок труда (по стратегии СЭР)</h2>
+                <p>Численность трудовых ресурсов в 2024 году — 878,8 тыс. человек. Ожидается сокращение до 2030 года, затем небольшой рост.</p>
+                <div class="grid-2">
+                    <div>
+                        <h3>Структура занятости (2024)</h3>
+                        <ul>
+                            <li>Обрабатывающие производства — 23,3%.</li>
+                            <li>Торговля — 16,4%.</li>
+                            <li>Транспортировка и хранение — 8,2%.</li>
+                            <li>Строительство — 8,0%.</li>
+                            <li>Социальная сфера — более 15%.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Востребованные профессии</h3>
+                        <ul>
+                            <li>Врачи и средний медперсонал.</li>
+                            <li>Технологи, инженеры, техники.</li>
+                            <li>Аналитики данных.</li>
+                        </ul>
+                        <p>Рабочая сила: 802 тыс. человек (83,5% с профобразованием, 30,5% с высшим).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 31: Пространственное развитие -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>28. Пространственное развитие</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Опорные населенные пункты (8)</h3>
+                        <ul>
+                            <li>Тула, Киреевск, Щекино, Алексин, Ефремов, Узловая, Донской, Новомосковск.</li>
+                            <li>Полицентричная агломерационная модель.</li>
+                            <li>Развитие транспортной доступности и коммунальной инфраструктуры.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Моногорода (5)</h3>
+                        <ul>
+                            <li>Алексин, Ефремов, Кимовск, Белев, Первомайский.</li>
+                            <li>Снижение зависимости от градообразующих предприятий.</li>
+                            <li>Развитие ТОР «Ефремов» и «Алексин».</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 32: Межрегионка (СЭР) -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>29. Межрегиональное сотрудничество</h2>
+                <p>Ключевой вектор — интеграция с московской агломерацией (главный потребитель продукции и источник инвестиций).</p>
+                <div class="grid-2">
+                    <div>
+                        <h3>Связи</h3>
+                        <ul>
+                            <li>Кооперация с Москвой и Московской областью.</li>
+                            <li>Сотрудничество с Липецкой, Калужской, Рязанской, Орловской областями.</li>
+                            <li>Участие в межрегиональных ассоциациях.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Внешнеэкономическая деятельность</h3>
+                        <ul>
+                            <li>80% экспорта — удобрения, химия, металлы.</li>
+                            <li>Приоритетные страны: Беларусь, Китай, Узбекистан.</li>
+                            <li>ЦПЭ — «единое окно» для МСП.</li>
+                            <li>Открытие торговых представительств за рубежом.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 33: Культура и туризм -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>30. Культура, туризм и креативные индустрии</h2>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card"><div class="stat-value">396</div><div class="stat-label">Библиотек</div></div>
+                    <div class="stat-card"><div class="stat-value">120</div><div class="stat-label">Музеев</div></div>
+                    <div class="stat-card"><div class="stat-value">>1,5 млн</div><div class="stat-label">Туристов (2022)</div></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h3>Туризм</h3>
+                        <ul>
+                            <li>Кластеры «Тульский», «Окский», «Куликовский».</li>
+                            <li>Развитие «Кондуков» и «Берега Дона».</li>
+                            <li>Более 200 объектов размещения.</li>
+                            <li>Событийный туризм: «Дикая мята», «Толстой», «День пряника».</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Креативные индустрии</h3>
+                        <ul>
+                            <li>Вклад в ВРП — 2,3% (26 млрд руб.).</li>
+                            <li>Кластер «Октава», пространство «Искра».</li>
+                            <li>200-летие Л.Н. Толстого (2028), 650-летие Куликовской битвы (2030).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 34: Финансирование -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>31. Механизмы и ресурсное обеспечение</h2>
+                <div class="grid-3" style="margin-bottom: 15px;">
+                    <div class="stat-card gold-border"><div class="stat-value">1 756,55 млрд ₽</div><div class="stat-label">Расходы бюджета на 2026–2036</div></div>
+                    <div class="stat-card"><div class="stat-value">479,05 млрд ₽</div><div class="stat-label">Первый этап (2026–2028)</div></div>
+                    <div class="stat-card"><div class="stat-value">1 277,5 млрд ₽</div><div class="stat-label">Второй этап (2029–2036)</div></div>
+                </div>
+                <h3>Приоритеты бюджетной политики</h3>
+                <ul>
+                    <li>Привлечение и удержание высокопрофессиональных кадров в бюджетной сфере.</li>
+                    <li>Развитие материально-технической базы государственных учреждений.</li>
+                    <li>Совершенствование межбюджетных отношений.</li>
+                    <li>Реализация 35 государственных программ.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Слайд 35: Риски и итог -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>32. Ключевые вызовы, риски и итоги</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Риски</h3>
+                        <ul>
+                            <li>Сокращение населения к 2036 году (до 1,29–1,31 млн).</li>
+                            <li>Миграционный отток в Московскую агломерацию.</li>
+                            <li>Зависимость от гособоронзаказа и санкций.</li>
+                            <li>Износ коммунальных сетей.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Пути решения</h3>
+                        <ul>
+                            <li>Развитие ТОР и ОЭЗ, привлечение инвесторов.</li>
+                            <li>Целевое обучение и закрепление молодежи.</li>
+                            <li>Модернизация ЖКХ и внедрение цифровых платформ.</li>
+                            <li>Активная демографическая политика.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px; text-align: center; border-left: none; border-top: 3px solid var(--accent-gold);">
+                    <h3 style="color: var(--accent-gold); margin-bottom: 5px;">Спасибо за внимание!</h3>
+                    <p>Стратегия-2036: устойчивое развитие, технологический суверенитет и комфортная среда для жизни.</p>
+                </div>
+            </div>
+        </div>
 
     </div>
 
+    <div class="slide-counter" id="slideCounter">01 / 35</div>
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn">&#8592;</button>
+        <button class="nav-btn" id="nextBtn">&#8594;</button>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const sections = document.querySelectorAll("section");
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('progressBar');
+            const slideCounter = document.getElementById('slideCounter');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
             
-            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+            let currentSlide = 0;
+            const totalSlides = slides.length;
 
-            const sectionObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("visible");
-                        
-                        const counters = entry.target.querySelectorAll('.counter');
-                        counters.forEach(counter => startCounter(counter));
-                        
-                        const animBars = entry.target.querySelectorAll('.anim-bar');
-                        animBars.forEach(bar => {
-                            const targetY = bar.getAttribute('data-y');
-                            const targetH = bar.getAttribute('data-h');
-                            setTimeout(() => {
-                                bar.setAttribute('y', targetY);
-                                bar.setAttribute('height', targetH);
-                            }, 300);
-                        });
+            function updateSlide() {
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[currentSlide].classList.add('active');
 
-                        const hBars = entry.target.querySelectorAll('.h-bar');
-                        hBars.forEach(bar => {
-                            const targetW = bar.getAttribute('data-w');
-                            setTimeout(() => {
-                                bar.style.width = targetW + 'px';
-                            }, 300);
-                        });
+                const progress = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progress}%`;
 
-                        const donutSegs = entry.target.querySelectorAll('.donut-segment');
-                        donutSegs.forEach(seg => {
-                            const targetDash = seg.getAttribute('data-dash');
-                            setTimeout(() => {
-                                seg.setAttribute('stroke-dasharray', targetDash);
-                            }, 300);
-                        });
-                        
-                        const linePath = entry.target.querySelector('.line-path');
-                        if(linePath) {
-                            setTimeout(() => {
-                                linePath.style.strokeDashoffset = '0';
-                            }, 300);
-                        }
-
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            sections.forEach(section => sectionObserver.observe(section));
-
-            function startCounter(el) {
-                const target = parseFloat(el.getAttribute('data-target'));
-                const decimals = parseInt(el.getAttribute('data-decimals') || 0);
-                const duration = 2000;
-                const startTime = performance.now();
-
-                function updateCounter(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const easeOut = 1 - Math.pow(1 - progress, 4);
-                    const currentValue = target * easeOut;
-
-                    if (decimals > 0) {
-                        el.textContent = currentValue.toFixed(decimals).replace('.', ',');
-                    } else {
-                        el.textContent = Math.floor(currentValue).toLocaleString('ru-RU');
-                    }
-
-                    if (progress < 1) {
-                        requestAnimationFrame(updateCounter);
-                    } else {
-                        if (decimals > 0) {
-                            el.textContent = target.toFixed(decimals).replace('.', ',');
-                        } else {
-                            el.textContent = Math.floor(target).toLocaleString('ru-RU');
-                        }
-                    }
-                }
-                requestAnimationFrame(updateCounter);
+                const currentStr = String(currentSlide + 1).padStart(2, '0');
+                const totalStr = String(totalSlides).padStart(2, '0');
+                slideCounter.textContent = `${currentStr} / ${totalStr}`;
+                
+                slides[currentSlide].scrollTop = 0;
             }
+
+            function nextSlide() {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            updateSlide();
         });
     </script>
 </body>
